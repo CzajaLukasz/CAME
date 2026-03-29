@@ -6,12 +6,12 @@ from tqdm import trange
 import argparse
 
 parser = argparse.ArgumentParser(description='Synthesize COCO train and val set for classification task')
-parser.add_argument('--coco-path', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/extra_data',
+parser.add_argument('--coco-path', metavar='DIR', default='./datasets/extra_data',
                     help='path to coco dataset')
 parser.add_argument('--sampleset-size', default=2000, type=int, metavar='N', help='the size of each sample set')
-parser.add_argument('--train-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/COCO/train2014/coco_cls_train_',
+parser.add_argument('--train-dir', metavar='DIR', default='./datasets/COCO/train2014/coco_cls_train_',
                     help='path to save the recovered training set')
-parser.add_argument('--val-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/COCO/val2014/coco_cls_val_',
+parser.add_argument('--val-dir', metavar='DIR', default='./datasets/COCO/val2014/coco_cls_val_',
                     help='path to save the recovered validation set')
 
 # ===================================================== #

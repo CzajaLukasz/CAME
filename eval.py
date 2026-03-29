@@ -16,17 +16,17 @@ from sklearn.linear_model import LinearRegression, HuberRegressor
 from sklearn.metrics import mean_squared_error
 
 parser = argparse.ArgumentParser(description='PyTorch SimCLR')
-parser.add_argument('--data', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/', help='path to dataset')
+parser.add_argument('--data', metavar='DIR', default='./datasets/', help='path to dataset')
 parser.add_argument('--test-dataset-name', default='mnist', help='Unseen target dataset name',
                     choices=['svhn', 'usps', 'cifar10_1', 'cifar10_c', 'cifar100',
                              'cifar100_c', 'caltech', 'pascal','imagenet', 'tinyimagenet_c'])
 parser.add_argument('--meta-dataset-name', default='mnist',
                     help='Meta-set dataset name', choices=['mnist', 'cifar10', 'cifar100', 'coco', 'tinyimagenet'])
-parser.add_argument('--metaset-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/metasets/MNIST',
+parser.add_argument('--metaset-dir', metavar='DIR', default='./metasets/MNIST',
                     help='path to save the generated meta-set')
 parser.add_argument('--metaset-numLim', default=1e6, type=int, metavar='N', help='the range of selected meta-set')
 model_names = sorted(name for name in models.__dict__  if name.islower() and not name.startswith("__")
-                     and callable(models.__dict__[name])) + ["lenet", "densenet40-12"]
+                     and callable(models.__dict__[name])) + ["lenet5", "densenet40-12"]
 parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18', choices=model_names,
                     help='model architecture: ' + ' | '.join(model_names) + ' (default: resnet50)')
 parser.add_argument('--pretrained', action='store_true', default=False, help='Use the pretrained cnn')
@@ -47,7 +47,7 @@ parser.add_argument('--reduce', default=1.0, type=float, help='compression rate 
 parser.add_argument('--no-bottleneck', dest='bottleneck', default=True, action='store_false', help='To not use bottleneck block')
 parser.set_defaults(bottleneck=True)
 parser.add_argument('--num-classes', default=10, type=int, help='total number of classes (default: 10)')
-parser.add_argument('--save-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/checkpoints/', help='path to save checkpoints')
+parser.add_argument('--save-dir', metavar='DIR', default='./checkpoints/', help='path to save checkpoints')
 parser.add_argument('--restore-file', default=None, help='filename from which to load checkpoint (default: <save-dir>/checkpoint_xxx.pth')
 parser.add_argument('--cl-model', default='SimCLR', help='the name of contrastive learning framework',
                     choices=['SimCLR', 'MoCo_V1', 'MoCo_V2', 'BYOL'])

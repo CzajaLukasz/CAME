@@ -16,7 +16,7 @@ class ContrastiveLearningViewGenerator(object):
         self.test_transform = None
 
         # MNIST Setup
-        if data_setup == "mnist1":
+        if data_setup == "mnist":
             self.normalize = transforms.Normalize((0.5,), (0.5,))
             self.train_transform = transforms.Compose([
                 transforms.ToTensor(),
@@ -28,7 +28,7 @@ class ContrastiveLearningViewGenerator(object):
             ])
 
         # CIFAR Setup
-        if data_setup == "cifar1":
+        if data_setup == "cifar":
             self.normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
                                                   std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
             self.train_transform = transforms.Compose([
@@ -43,7 +43,7 @@ class ContrastiveLearningViewGenerator(object):
             ])
 
         # COCO Setup
-        if data_setup == "coco1":
+        if data_setup == "coco":
             self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                              std=[0.229, 0.224, 0.225])
             self.train_transform = transforms.Compose([

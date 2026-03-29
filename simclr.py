@@ -82,7 +82,7 @@ class SimCLR(object):
                 'state_dict': self.model.state_dict(),
                 'optimizer': self.optimizer.state_dict(),
             }, is_best=is_best, filename=os.path.join(self.writer.log_dir, checkpoint_name))  # if it's best, then store it as the best model
-            logging.info('Best classification accuracy:', best_acc)
+            logging.info('Best classification accuracy: %f', best_acc)
             logging.info(f"Model checkpoint and metadata has been saved at {self.writer.log_dir}.")
         logging.info("Training has finished.")
 
@@ -180,7 +180,7 @@ class SimCLR(object):
                     con_acc1, con_acc5 = accuracy(con_logits, con_targets, topk=(1, 5))
                     con_loss = self.criterion(con_logits, con_targets)
 
-                    loss = self.args.claLoss_weight * con_loss + self.args.claLoss_weight * cla_loss
+                    loss = self.args.conLoss_weight * con_loss + self.args.claLoss_weight * cla_loss
 
                     ### measure accuracies and losses
                     cla_top1.update(cla_acc1.item(), cur_batch_size)

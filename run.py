@@ -11,7 +11,7 @@ from utils import *
 from simclr import SimCLR
 
 parser = argparse.ArgumentParser(description='PyTorch SimCLR')
-parser.add_argument('--data', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/', help='path to dataset')
+parser.add_argument('--data', metavar='DIR', default='./datasets/', help='path to dataset')
 parser.add_argument('--dataset-name', default='mnist', help='training dataset name',
                     choices=['mnist', 'mnist_raw', 'fashion_mnist', 'k_mnist', 'cifar10', 'cifar100', 'stl10',
                              'coco', 'tinyimagenet'])
@@ -21,7 +21,7 @@ parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18', choices=
                     help='model architecture: ' + ' | '.join(model_names) + ' (default: resnet50)')
 parser.add_argument('--pretrained', action='store_true', default=False, help='Use the pretrained cnn')
 parser.add_argument('-j', '--workers', default=12, type=int, metavar='N', help='number of data loading workers (default: 32)')
-parser.add_argument('--epochs', default=200, type=int, metavar='N', help='number of total epochs')
+parser.add_argument('--epochs', default=2, type=int, metavar='N', help='number of total epochs')
 parser.add_argument('-b', '--batch-size', default=256, type=int, metavar='N', help='mini-batch size')
 parser.add_argument('-lr', '--learning-rate', default=0.0003, type=float, metavar='LR', help='initial learning rate', dest='lr')
 parser.add_argument('-wd', '--weight-decay', default=1e-4, type=float, metavar='W', help='weight decay (default: 1e-4)', dest='weight_decay')
@@ -40,9 +40,9 @@ parser.add_argument('--reduce', default=1.0, type=float, help='compression rate 
 parser.add_argument('--no-bottleneck', dest='bottleneck', default=True, action='store_false', help='To not use bottleneck block')
 parser.set_defaults(bottleneck=True)
 parser.add_argument('--num-classes', default=10, type=int, help='total number of classes (default: 10)')
-parser.add_argument('--save-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/checkpoints/', help='path to save checkpoints')
+parser.add_argument('--save-dir', metavar='DIR', default='./checkpoints/', help='path to save checkpoints')
 parser.add_argument('--restore-file', default=None, help='filename from which to load checkpoint (default: <save-dir>/checkpoint_xxx.pth')
-parser.add_argument('--optimizer', default='adam', help='optimizer name', choices=['SGD', 'Adam', 'Adadelta'])
+parser.add_argument('--optimizer', default='Adam', help='optimizer name', choices=['SGD', 'Adam', 'Adadelta'])
 parser.add_argument('--scheduler', default=None, help='scheduler name', choices=[None, 'CosineAnnealing', 'MultiStep', 'Exponential'])  # <fix>
 parser.add_argument('--milestones', default='(150, 225)', metavar='B', help='the milestones for Scheduler MultiStepLR')
 parser.add_argument('--gamma', default=0.1, type=float, help='the gama for Scheduler MultiStepLR')
@@ -74,6 +74,7 @@ def load_model(args):
 
 
 def load_optimizer(args, model):
+    optimizer = None
     if args.optimizer == "SGD":
         optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, nesterov=True,
                                     weight_decay=args.weight_decay)
@@ -85,6 +86,7 @@ def load_optimizer(args, model):
 
 
 def load_scheduler(args, optimizer):
+    scheduler = None
     # Set the learning rate of each parameter group using a cosine annealing schedule
     if args.scheduler == "CosineAnnealing":
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100, eta_min=0.0003, last_epoch=-1)
@@ -141,7 +143,7 @@ def main():
     scheduler = load_scheduler(args, optimizer)
 
     # Run
-    simclr = SimCLR(model=model, optimizer=optimizer, scheduler=scheduler, dataset_name=args.train_dataset_name, args=args)
+    simclr = SimCLR(model=model, optimizer=optimizer, scheduler=scheduler, dataset_name=args.dataset_name, args=args)
     simclr.run(train_loader, val_loader, best_acc=best_acc)
 
 

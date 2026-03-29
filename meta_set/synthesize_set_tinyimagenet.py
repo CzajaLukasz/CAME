@@ -12,12 +12,12 @@ import argparse
 from data_aug.contrastive_learning_dataset import ContrastiveLearningDataset
 
 parser = argparse.ArgumentParser(description='Synthesize TinyImageNet Meta-set')
-parser.add_argument('--tinyimagenet-path', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/',
+parser.add_argument('--tinyimagenet-path', metavar='DIR', default='./datasets/',
                     help='path to tinyimagenet dataset')
 parser.add_argument('--dataset-name', default='tinyimagenet', help='seed dataset name', choices=['tinyimagenet'])
 parser.add_argument('--metaset-size', default=700, type=int, metavar='N', help='the number of sample sets')
 parser.add_argument('--sampleset-size', default=400, type=int, metavar='N', help='the size of each sample set')
-parser.add_argument('--metaset-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/metasets/TinyImageNet',
+parser.add_argument('--metaset-dir', metavar='DIR', default='./metasets/TinyImageNet',
                     help='path to save the generated meta-set')
 parser.add_argument('-j', '--workers', default=32, type=int, metavar='N', help='number of data loading workers (default: 32)')
 

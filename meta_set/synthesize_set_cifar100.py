@@ -11,11 +11,11 @@ import argparse
 from data_aug.contrastive_learning_dataset import ContrastiveLearningDataset
 
 parser = argparse.ArgumentParser(description='Synthesize CIFAR Meta-set')
-parser.add_argument('--cifar-path', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/', help='path to cifar dataset')
+parser.add_argument('--cifar-path', metavar='DIR', default='./datasets/', help='path to cifar dataset')
 parser.add_argument('--dataset-name', default='cifar10', help='seed dataset name', choices=['cifar10', 'cifar100', 'stl10'])
 parser.add_argument('--metaset-size', default=1000, type=int, metavar='N', help='the number of sample sets')
 parser.add_argument('--sampleset-size', default=10000, type=int, metavar='N', help='the size of each sample set')
-parser.add_argument('--metaset-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/metasets/CIFAR10', help='path to save the generated meta-set')
+parser.add_argument('--metaset-dir', metavar='DIR', default='./metasets/CIFAR10', help='path to save the generated meta-set')
 parser.add_argument('-j', '--workers', default=32, type=int, metavar='N', help='number of data loading workers (default: 32)')
 
 # ===================================================== #

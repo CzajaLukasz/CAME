@@ -11,14 +11,14 @@ import argparse
 from data_aug.contrastive_learning_dataset import ContrastiveLearningDataset
 
 parser = argparse.ArgumentParser(description='Synthesize MNIST Meta-set')
-parser.add_argument('--mnist-path', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/',
+parser.add_argument('--mnist-path', metavar='DIR', default='./datasets/',
                     help='path to mnist dataset')
-parser.add_argument('--coco-path', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/extra_data/train2014/',
+parser.add_argument('--coco-path', metavar='DIR', default='./datasets/extra_data/train2014/',
                     help='path to coco dataset')
 parser.add_argument('--dataset-name', default='mnist', help='seed dataset name', choices=['mnist', 'fashion_mnist', 'k_mnist'])
 parser.add_argument('--metaset-size', default=200, type=int, metavar='N', help='the number of sample sets')
 parser.add_argument('--sampleset-size', default=10000, type=int, metavar='N', help='the image number in each sample set')
-parser.add_argument('--metaset-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/metasets/MNIST',
+parser.add_argument('--metaset-dir', metavar='DIR', default='./metasets/MNIST',
                     help='path to save the generated meta-set')
 
 

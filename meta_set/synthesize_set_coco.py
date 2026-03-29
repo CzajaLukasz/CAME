@@ -11,11 +11,11 @@ from PIL import Image
 import argparse
 
 parser = argparse.ArgumentParser(description='Synthesize COCO Meta-set')
-parser.add_argument('--coco-path', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/datasets/extra_data',
+parser.add_argument('--coco-path', metavar='DIR', default='./datasets/extra_data',
                     help='path to coco dataset')
 parser.add_argument('--metaset-size', default=200, type=int, metavar='N', help='the number of sample sets')
 parser.add_argument('--sampleset-size', default=600, type=int, metavar='N', help='the size of each sample set')
-parser.add_argument('--metaset-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/metasets/COCO/coco_cls_val_b_',
+parser.add_argument('--metaset-dir', metavar='DIR', default='./metasets/COCO/coco_cls_val_b_',
                     help='path to save the generated meta-set')
 parser.add_argument('-j', '--workers', default=32, type=int, metavar='N', help='number of data loading workers (default: 32)')
 

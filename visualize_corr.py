@@ -8,7 +8,7 @@ from matplotlib.pyplot import MultipleLocator
 import random
 
 parser = argparse.ArgumentParser(description='PyTorch SimCLR')
-parser.add_argument('--save-dir', metavar='DIR', default='/data/pengru/Contrastive_AutoEval/checkpoints/',
+parser.add_argument('--save-dir', metavar='DIR', default='./checkpoints/',
                     help='path to save checkpoints')
 parser.add_argument('--epochs', default=200, type=int, metavar='N',
                     help='number of total epochs to run')

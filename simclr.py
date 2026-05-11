@@ -38,6 +38,14 @@ class SimCLR(object):
         self.writer = SummaryWriter(log_dir=os.path.join(self.args.save_dir, kwargs['dataset_name']))
         logging.basicConfig(filename=os.path.join(self.writer.log_dir, 'training.log'), level=logging.DEBUG)
         self.criterion = torch.nn.CrossEntropyLoss().to(self.args.device)
+        # Timing tracking
+        self.cla_time_total = 0.0
+        self.con_time_total = 0.0
+        self.data_prep_time_total = 0.0
+        self.forward_time_total = 0.0
+        self.backward_time_total = 0.0
+        self.test_time_total = 0.0
+        self.num_batches = 0
 
     def info_nce_loss(self, features, batch_size):
         labels = torch.cat([torch.arange(batch_size) for i in range(self.args.n_views)], dim=0)
@@ -84,6 +92,26 @@ class SimCLR(object):
             }, is_best=is_best, filename=os.path.join(self.writer.log_dir, checkpoint_name))  # if it's best, then store it as the best model
             logging.info('Best classification accuracy: %f', best_acc)
             logging.info(f"Model checkpoint and metadata has been saved at {self.writer.log_dir}.")
+        
+        # Log timing statistics
+        if self.num_batches > 0:
+            avg_cla_time = self.cla_time_total / self.num_batches
+            avg_con_time = self.con_time_total / self.num_batches
+            avg_data_prep_time = self.data_prep_time_total / self.num_batches
+            avg_forward_time = self.forward_time_total / self.num_batches
+            avg_backward_time = self.backward_time_total / self.num_batches
+            
+            logging.info("=" * 70)
+            logging.info("TRAINING TIME STATISTICS")
+            logging.info("=" * 70)
+            logging.info(f"Data Preparation - Average: {avg_data_prep_time:.4f}s/batch, Total: {self.data_prep_time_total:.2f}s")
+            logging.info(f"Forward Pass - Average: {avg_forward_time:.4f}s/batch, Total: {self.forward_time_total:.2f}s")
+            logging.info(f"  - Classification: Average {avg_cla_time:.4f}s/batch, Total: {self.cla_time_total:.2f}s")
+            logging.info(f"  - Contrastive Learning: Average {avg_con_time:.4f}s/batch, Total: {self.con_time_total:.2f}s")
+            logging.info(f"Backward Pass & Optimization - Average: {avg_backward_time:.4f}s/batch, Total: {self.backward_time_total:.2f}s")
+            logging.info(f"Validation - Total: {self.test_time_total:.2f}s")
+            logging.info("=" * 70)
+        
         logging.info("Training has finished.")
 
     def train(self, scaler, train_loader, epoch_counter):
@@ -94,24 +122,40 @@ class SimCLR(object):
 
         end = time.time()
         for images, targets in tqdm(train_loader):
+            # Time data preparation
+            data_start = time.time()
             images = torch.cat(images, dim=0)
             images = images.to(self.args.device)
             targets = torch.cat([targets, targets], dim=0)
             targets = targets.to(self.args.device)
+            data_prep_elapsed = time.time() - data_start
+            self.data_prep_time_total += data_prep_elapsed
 
+            # Time forward pass
+            forward_start = time.time()
             with autocast(enabled=self.args.fp16_precision):
                 cla_logits, con_features = self.model(images)
 
                 ## classification, only use original images (the 2nd half) and the current batch size may be dynamic
                 cur_batch_size = images.shape[0] // 2
                 cla_logits, cla_targets = cla_logits[cur_batch_size:, :], targets[cur_batch_size:]
+                
+                # Time classification
+                cla_start_time = time.time()
                 cla_acc1, cla_acc5 = accuracy(cla_logits, cla_targets, topk=(1, 5))
                 cla_loss = self.criterion(cla_logits, cla_targets)
+                cla_elapsed = time.time() - cla_start_time
+                self.cla_time_total += cla_elapsed
 
                 ##contrastive learning
+                # Time contrastive learning
+                con_start_time = time.time()
                 con_logits, con_targets = self.info_nce_loss(con_features, cur_batch_size)
                 con_acc1, con_acc5 = accuracy(con_logits, con_targets, topk=(1, 5))
                 con_loss = self.criterion(con_logits, con_targets)
+                con_elapsed = time.time() - con_start_time
+                self.con_time_total += con_elapsed
+                self.num_batches += 1
 
                 ### multi-task / only classification loss / only contrastive learning loss ###
                 loss = self.args.claLoss_weight * con_loss + self.args.claLoss_weight * cla_loss
@@ -125,11 +169,17 @@ class SimCLR(object):
                 con_losses.update(con_loss.item())
                 losses.update(loss.item())
 
+            forward_elapsed = time.time() - forward_start
+            self.forward_time_total += forward_elapsed
+
             ## compute gradient and do optimizer step
+            backward_start = time.time()
             self.optimizer.zero_grad()
             scaler.scale(loss).backward()
             scaler.step(self.optimizer)
             scaler.update()
+            backward_elapsed = time.time() - backward_start
+            self.backward_time_total += backward_elapsed
 
             ## measure elapsed time
             batch_time.update(time.time() - end)
@@ -159,6 +209,7 @@ class SimCLR(object):
         AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter()
         self.model.eval()
 
+        test_start = time.time()
         end = time.time()
         for images, targets in tqdm(test_loader):
             images = torch.cat(images, dim=0)
@@ -194,6 +245,9 @@ class SimCLR(object):
                 # measure elapsed time
                 batch_time.update(time.time() - end)
                 end = time.time()
+
+        test_elapsed = time.time() - test_start
+        self.test_time_total += test_elapsed
 
         # print the contrastive and classification loss, Top1 Acc, Cls Acc
         logging.debug(f"Test:\tbatch_time: {batch_time.sum}\tLoss: {losses.avg}\tCla_Loss: {cla_losses.avg}\tCon_Loss: {con_losses.avg}" +\

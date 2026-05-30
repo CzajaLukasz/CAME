@@ -15,18 +15,14 @@ COPY environment.yml .
 RUN conda env create -f environment.yml
 
 # FIX 1: Set PATH so we don't need to activate the environment
-# This removes the need for "conda run" or SHELL tricks
 ENV PATH="/opt/conda/envs/came/bin:$PATH"
 ENV CONDA_DEFAULT_ENV="came"
 
-# FIX 2: Install PyTorch separately with high timeout
-# We use the extra-index-url to get the specific CUDA 11.0 version you originally wanted
-# --default-timeout=1000 prevents the ReadTimeoutError
-RUN pip install torch==1.7.0+cu110 torchvision==0.8.1+cu110 \
-    -f https://download.pytorch.org/whl/torch_stable.html \
+# FIX 2: Nowoczesny PyTorch z obsługą CUDA 12.1 dla karty NVIDIA H100 (architektura sm_90)
+RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121 \
     --default-timeout=1000 --no-cache-dir
 
-# Install COCOAPI (now using the 'came' environment python automatically)
+# Install COCOAPI (używa środowiska 'came' automatycznie)
 RUN mkdir -p libs && \
     cd libs && \
     git clone https://github.com/cocodataset/cocoapi.git && \

@@ -4,7 +4,7 @@ import collections
 import itertools
 from torch.autograd import Variable
 import imageio
-
+import numpy as np
 
 def loadMnist(mode, path):
     print('Loading MNIST', mode, 'images')

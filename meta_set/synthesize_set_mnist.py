@@ -24,6 +24,7 @@ parser.add_argument('--metaset-dir', metavar='DIR', default='./metasets/MNIST',
 
 def creat_bg(input_image, img, change_colors=False):
     # Rotate image
+    
     input_image = random_rotation_new(input_image)
     # Extend to RGB
     input_image = np.expand_dims(input_image, 2)
@@ -52,15 +53,15 @@ def creat_bg(input_image, img, change_colors=False):
     return image_bg
 
 
-def makeMnistbg(metaset_dir, img, num=1):  # <fix>
+def makeMnistbg(metaset_dir, img, all_samples_test, num=1):  # <fix>
     """
     Change the background of  MNIST images
     Select all testing samples from MNIST
     Store in numpy file for fast reading
     """
-
+    
     index = str(num).zfill(5)
-    np.random.seed(0)
+    #np.random.seed(0) <-- to blokowało losowość!
 
     # Empty arrays
     test_data = np.zeros([28, 28, 3, 10000])
@@ -70,9 +71,9 @@ def makeMnistbg(metaset_dir, img, num=1):  # <fix>
     train_label = np.zeros([50000])
 
     try:
-        os.makedirs(f'{metaset_dir}/mnist_bg_{index}/images/')
-    except:
-        print("fail to create dir")
+        os.makedirs(f'{metaset_dir}/mnist_bg_{index}/images/', exist_ok=True)
+    except Exception as e:
+        print(f"fail to create dir. Prawdziwy powód błędu: {e}")
 
     # testing images
     i = 0
@@ -90,14 +91,15 @@ def makeMnistbg(metaset_dir, img, num=1):  # <fix>
     # np.save(f'{metaset_dir}/mnist_bg_{index}/test_label', test_label)
 
 
-def makeMnistbg_path(metaset_dir, img_paths, num=1):  # <fix>
+def makeMnistbg_path(metaset_dir, img_paths, all_samples_test, num=1):  # <fix>
     """
     Change the background of  MNIST images
     Select all testing samples from MNIST
     Store in numpy file for fast reading
     """
+    
     index = str(num).zfill(5)
-    np.random.seed(0)
+    #np.random.seed(0) <-- to blokowało losowość!
 
     # Empty arrays
     test_data = np.zeros([28, 28, 3, 10000])
@@ -131,6 +133,7 @@ def makeMnistbg_path(metaset_dir, img_paths, num=1):  # <fix>
 
 if __name__ == '__main__':
     # ---- load mnist images ----#
+    
     args = parser.parse_args()
     ## we do not use the loadMnist and text-xxx.csv to load the Mnist data
     # all_samples_test = loadMnist('test', args.mnist_path+args.dataset_name.upper()+r'/')
@@ -155,20 +158,21 @@ if __name__ == '__main__':
 
     # two ways of selecting coco images as background, both ways are similar in terms of meta set diversity
     # ----------- way 1 ----------- #
-    for i in trange(num):
+    # for i in trange(num):
+    #     try:
+    #         img = PIL.Image.open(files[i])
+    #         makeMnistbg(args.metaset_dir, img, all_samples_test, conut)  # <fix>
+    #         conut += 1
+    #     except Exception as e:
+    #         # FIX: Zamiast samego "jump an image!", zobaczymy dlaczego skrypt skacze
+    #         print(f'jump an image! Powód: {e}')
+
+    # ----------- way 2 ----------- #
+    for _ in trange(num):
         try:
-            img = PIL.Image.open(files[i])
-            makeMnistbg(args.metaset_dir, img, conut)  # <fix>
+            b_indice = np.random.choice(len( files), 1)
+            img_paths = np.array(files)[b_indice]
+            makeMnistbg_path(args.metaset_dir, img_paths, all_samples_test, conut)  # <fix>
             conut += 1
         except:
             print('jump an image!')
-
-    # ----------- way 2 ----------- #
-    # for _ in trange(num):
-    #     try:
-    #         b_indice = np.random.choice(len( files), 1)
-    #         img_paths = np.array(files)[b_indice]
-    #         makeMnistbg_path(args.metaset_dir, img_paths, conut)  # <fix>
-    #         conut += 1
-    #     except:
-    #         print('jump an image!')

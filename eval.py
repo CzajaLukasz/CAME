@@ -48,7 +48,7 @@ parser.add_argument('--no-bottleneck', dest='bottleneck', default=True, action='
 parser.set_defaults(bottleneck=True)
 parser.add_argument('--num-classes', default=10, type=int, help='total number of classes (default: 10)')
 parser.add_argument('--save-dir', metavar='DIR', default='./checkpoints/', help='path to save checkpoints')
-parser.add_argument('--restore-file', default=None, help='filename from which to load checkpoint (default: <save-dir>/checkpoint_xxx.pth')
+parser.add_argument('--restore-file', default='./checkpoints/mnist/checkpoint_best.pth', help='filename from which to load checkpoint (default: <save-dir>/checkpoint_xxx.pth')
 parser.add_argument('--cl-model', default='SimCLR', help='the name of contrastive learning framework',
                     choices=['SimCLR', 'MoCo_V1', 'MoCo_V2', 'BYOL'])
 parser.add_argument('--brightness', default=0.8, type=float, help='brightness value in ColorJitter')
@@ -60,6 +60,7 @@ parser.add_argument('--data-setup', default='mnist', help='the processed data se
                     choices=['none', 'mnist', 'cifar', 'coco', 'tinyimagenet'])
 parser.add_argument('--claLoss-weight', default=1., type=float, metavar='D', help='weight for classification loss')
 parser.add_argument('--conLoss-weight', default=1., type=float, metavar='D', help='weight for contrastive loss')
+parser.add_argument('--test-batch-size', default=128, type=int, help='test batch size')
 
 
 def load_model(args):
@@ -105,8 +106,8 @@ def main():
     simclr = SimCLR(model=model, optimizer=None, scheduler=None, dataset_name=args.test_dataset_name, args=args)
 
     epoch = checkpoint['epoch']
-    print(f'\nEpoch:{epoch}')
-    print(f'\nTest batch size:{args.test_batch_size}')
+    #print(f'\nEpoch:{epoch}')
+    #print(f'\nTest batch size:{args.test_batch_size}')
 
     # eval on unseen test set
     print(f'Test on {args.test_dataset_name}')
@@ -217,13 +218,13 @@ def main():
     slr = LinearRegression()
     slr.fit(np.array(con_acc.reshape(-1, 1)), np.array(cla_acc.reshape(-1, 1)))
     pred = slr.predict(np.array(test_con_acc).reshape(-1, 1))
-    error = mean_squared_error(pred, np.array(test_cla_acc).reshape(-1, 1), squared=False)  # squared=False returns RMSE value
+    error = np.sqrt(mean_squared_error(pred, np.array(test_cla_acc).reshape(-1, 1))) # <--- POPRAWKA
     print('\nLinear regression model predicts %4f, its absolute error is %4f' % (pred, error))
 
     robust_reg = HuberRegressor()
     robust_reg.fit(np.array(con_acc.reshape(-1, 1)), np.array(cla_acc.reshape(-1)))
     robust_pred = robust_reg.predict(np.array(test_con_acc).reshape(-1, 1))
-    robust_error = mean_squared_error(robust_pred, np.array(test_cla_acc).reshape(-1, 1), squared=False)
+    robust_error = np.sqrt(mean_squared_error(robust_pred, np.array(test_cla_acc).reshape(-1, 1))) # <--- POPRAWKA
     print('Robust Linear regression model predicts %4f, its absolute error is %4f' % (robust_pred, robust_error))
 
 

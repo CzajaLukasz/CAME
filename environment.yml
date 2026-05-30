@@ -2,11 +2,11 @@ name: came
 channels:
   - defaults
 dependencies:
-  - python=3.7
+  - python=3.10  # Podbito z 3.7 na 3.10 dla obsługi nowego PyTorcha
   - pip
   - cython
   - pip:
-    - numpy==1.21.6
+    - numpy      # Usunięto starą wersję 1.21.6 (3.10 wymaga nowszego numpy)
     - pandas
     - scipy
     - scikit-learn

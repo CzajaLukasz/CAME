@@ -5,7 +5,7 @@ from torchvision import models
 from data_aug.contrastive_learning_dataset import ContrastiveLearningDataset
 from models.densenet_simclr import DenseNetSimCLR
 from models.lenet_simclr import LeNetSimCLR
-from models.resnet_simclr import ResNetSimCLR
+from models.resnet_simclr import ResNetSimCLR, ConvNeXtSimCLR
 from models.vgg_simclr import VggSimCLR
 from utils import *
 from simclr import SimCLR
@@ -70,6 +70,9 @@ def load_model(args):
         model = VggSimCLR(base_model=args.arch, pretrained=args.pretrained, num_classes=args.num_classes, out_dim=args.out_dim)
     elif args.arch.startswith("resnet"):
         model = ResNetSimCLR(base_model=args.arch, pretrained=args.pretrained, num_classes=args.num_classes, out_dim=args.out_dim)
+    # ---- TUTAJ DOPISUJEMY TWÓJ NOWY MODEL ----
+    elif args.arch.startswith("convnext"):
+        model = ConvNeXtSimCLR(base_model=args.arch, pretrained=args.pretrained, num_classes=args.num_classes, out_dim=args.out_dim)
     return model
 
 

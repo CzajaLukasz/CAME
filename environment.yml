@@ -6,6 +6,7 @@ dependencies:
   - pip
   - cython
   - pip:
+    - numpy<2.0.0
     - numpy      # Usunięto starą wersję 1.21.6 (3.10 wymaga nowszego numpy)
     - pandas
     - scipy
@@ -18,3 +19,4 @@ dependencies:
     - pillow
     - requests
     - imageio
+    - imgaug

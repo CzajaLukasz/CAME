@@ -1,0 +1,23 @@
+{
+    // Ukrywa foldery w drzewie plików i wyłącza ich śledzenie (File Watcher)
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/__pycache__": true,
+        "**/datasets/**": true,
+        "**/metasets/**": true,
+        "**/libs/**": true
+    },
+    // Wyklucza foldery z globalnego wyszukiwania tekstowego w VS Code
+    "search.useIgnoreFiles": true,
+    "search.exclude": {
+        "**/datasets/**": true,
+        "**/metasets/**": true,
+        "**/libs/**": true
+    },
+    // Wyłączenie automatycznego watchowania dużych bibliotek pobranych przez git
+    "git.autorefresh": false,
+    "git.ignoredRepositories": [
+        "libs/cocoapi"
+    ]
+}
